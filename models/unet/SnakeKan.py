@@ -27,7 +27,8 @@ class SnakeKan(nn.Module):
             nn.ReLU(),
             nn.Conv2d(64, 64, 3, 1, 1),
         )
-        self.outc = (OutConv(64, n_classes))
+        ### b 64 h w
+        self.outc = KAN(layers_hidden=[64,32,16,2])
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -39,7 +40,12 @@ class SnakeKan(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        logits = self.outc(self.enc(x))
+        x = self.enc(x)
+        b,_,h,w = x.shape
+        x = x.flatten(2)
+        x = x.permute(0,2,1)
+        logits = self.outc(x)
+        logits = logits.permute(0,2,1).reshape(b,-1,h,w)
         return logits
 
     def use_checkpointing(self):
