@@ -38,6 +38,7 @@ if __name__ == '__main__':
         opt = SnakeKanConfig()
 
     model = opt.model(n_channels=3,n_classes=opt.n_classes)
+    model=model.to(opt.device)
     optimizer = opt.optimizer(model.parameters(),lr=1e-4)
     trainDataset = opt.dataset(opt,phase='train')
     valDataset = opt.dataset(opt,phase='val')

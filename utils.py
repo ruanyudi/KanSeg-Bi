@@ -15,6 +15,8 @@ def calculate_iou(pred, label, num_classes):
     """
     # 将 logits 转换为类别预测
     pred = torch.argmax(pred, axis=1)  # shape: (B, H, W)
+    pred=pred.cpu()
+    label=label.cpu()
 
     ious = []
 
