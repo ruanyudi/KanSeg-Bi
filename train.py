@@ -49,4 +49,4 @@ if __name__ == '__main__':
         torch.save(model.state_dict(), 'latest.pth')
         if (epoch+1)%5==0:
             miou = pred_one_epoch(opt,model, valLoader, optimizer, epoch,train=False)
-            print(miou)
+            torch.save(model.state_dict(),f'./weights/{opt.name}_{epoch}_{miou}.pth')
