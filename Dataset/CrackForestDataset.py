@@ -39,8 +39,8 @@ class CrackForestDataset(Dataset):
         label = Image.open(label_filepath)
         image = self.opt.transforms(image)
         label = self.opt.transforms(label)
-        label.to(torch.int32)
-        return image, label
+        label = label.squeeze()
+        return image, label.long()
     def __len__(self):
         return self.length
 

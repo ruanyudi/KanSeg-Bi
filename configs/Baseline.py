@@ -14,9 +14,10 @@ class Config:
         transforms.ToTensor(),
         transforms.Resize(64)
     ])
+    n_classes = 2
     model:torch.nn.Module = BaseModel
     optimizer = torch.optim.Adam
-    criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = torch.nn.CrossEntropyLoss()
     dataset = CrackForestDataset
     batch_size:int = 2
     epochs:int = 300
