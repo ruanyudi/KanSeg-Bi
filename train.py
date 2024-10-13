@@ -27,7 +27,7 @@ def pred_one_epoch(opt,model, train_loader, optimizer, epoch,train=True):
         losses.append(loss.item())
         mious.append(calculate_miou(pred_masks, labels,opt.n_classes))
         train_loader.set_description(f"Phase: {prefix} | Epoch: {epoch} | Loss: {np.mean(losses)} | MIou: {np.mean(mious)}")
-
+    return np.mean(mious)
 
 if __name__ == '__main__':
     args = getArgs()
@@ -48,4 +48,5 @@ if __name__ == '__main__':
         pred_one_epoch(opt,model, trainLoader, optimizer, epoch,train=True)
         torch.save(model.state_dict(), 'latest.pth')
         if (epoch+1)%5==0:
-            pred_one_epoch(opt,model, valLoader, optimizer, epoch,train=False)
+            miou = pred_one_epoch(opt,model, valLoader, optimizer, epoch,train=False)
+            print(miou)
