@@ -1,11 +1,11 @@
 """ Full assembly of the parts to form the complete network """
 
-from .unet_parts import *
+from .SnakeKan_parts import *
 
 
-class UNet(nn.Module):
-    def __init__(self, n_channels, n_classes, bilinear=False):
-        super(UNet, self).__init__()
+class SnakeKan(nn.Module):
+    def __init__(self,opt, n_channels, n_classes, bilinear=False):
+        super(SnakeKan, self).__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
@@ -21,11 +21,11 @@ class UNet(nn.Module):
         self.up3 = (Up(256, 128 // factor, bilinear))
         self.up4 = (Up(128, 64, bilinear))
         self.enc = nn.Sequential(
-            nn.Conv2d(64,64,3,1,1),
+            DSConv(64, 64, 3,morph=0,device=opt.device),
             nn.ReLU(),
-            nn.Conv2d(64,64,3,1,1),
+            DSConv(64, 64, 3,morph=1,device=opt.device),
             nn.ReLU(),
-            nn.Conv2d(64,64,3,1,1),
+            nn.Conv2d(64, 64, 3, 1, 1),
         )
         self.outc = (OutConv(64, n_classes))
 

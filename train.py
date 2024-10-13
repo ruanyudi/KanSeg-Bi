@@ -7,7 +7,7 @@ import numpy as np
 from utils import calculate_miou
 def getArgs():
     parser = argparse.ArgumentParser(description="命令行参数示例")
-    parser.add_argument('--name', type=str, default='baseline', help='Name of model')
+    parser.add_argument('--name', type=str, default='snakekan', help='Name of model')
     args = parser.parse_args()
     return args
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     else:
         opt = SnakeKanConfig()
 
-    model = opt.model(n_channels=3,n_classes=opt.n_classes)
+    model = opt.model(opt,n_channels=3,n_classes=opt.n_classes)
     model=model.to(opt.device)
     optimizer = opt.optimizer(model.parameters(),lr=1e-4)
     trainDataset = opt.dataset(opt,phase='train')

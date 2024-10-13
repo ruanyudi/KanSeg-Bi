@@ -38,7 +38,7 @@ if __name__ == '__main__':
     else:
         opt = SnakeKanConfig()
 
-    model = opt.model(n_channels=3,n_classes=opt.n_classes)
+    model = opt.model(opt,n_channels=3,n_classes=opt.n_classes)
     model.load_state_dict(torch.load(opt.eval_weight,map_location=opt.device))
     model = model.to(opt.device)
     model.eval()

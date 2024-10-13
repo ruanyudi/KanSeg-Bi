@@ -20,6 +20,6 @@ class Config:
     criterion = torch.nn.CrossEntropyLoss()
     dataset = CrackForestDataset
     batch_size:int = 2
-    epochs:int = 300
+    epochs:int = 10
     device:str = 'cuda' if torch.cuda.is_available() else 'cpu'
     eval_weight = './latest.pth'
