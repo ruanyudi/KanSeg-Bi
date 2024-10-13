@@ -1,4 +1,5 @@
 import argparse
+
 from configs.Baseline import Config as BaselineConfig
 from configs.SnakeKan import Config as SnakeKanConfig
 import torch
@@ -38,15 +39,11 @@ if __name__ == '__main__':
         opt = SnakeKanConfig()
 
     model = opt.model(n_channels=3,n_classes=opt.n_classes)
-    model=model.to(opt.device)
+    model.load_state_dict(torch.load(opt.eval_weight,map_location=opt.device))
+    model = model.to(opt.device)
+    model.eval()
     optimizer = opt.optimizer(model.parameters(),lr=1e-4)
-    trainDataset = opt.dataset(opt,phase='train')
-    valDataset = opt.dataset(opt,phase='val')
-    trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=opt.batch_size, shuffle=True)
-    valLoader = torch.utils.data.DataLoader(valDataset,batch_size=opt.batch_size,shuffle=False)
-    for epoch in range(opt.epochs):
-        pred_one_epoch(opt,model, trainLoader, optimizer, epoch,train=True)
-        torch.save(model.state_dict(), 'latest.pth')
-        if (epoch+1)%5==0:
-            miou = pred_one_epoch(opt,model, valLoader, optimizer, epoch,train=False)
-            print(miou)
+    testDataset = opt.dataset(opt,phase='test')
+    testLoader = torch.utils.data.DataLoader(testDataset,batch_size=opt.batch_size,shuffle=False)
+    miou = pred_one_epoch(opt,model,testLoader,optimizer,0,train=False)
+    print(miou)

@@ -22,3 +22,4 @@ class Config:
     batch_size:int = 2
     epochs:int = 300
     device:str = 'cuda' if torch.cuda.is_available() else 'cpu'
+    eval_weight = './latest.pth'
