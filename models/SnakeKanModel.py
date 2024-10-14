@@ -8,3 +8,5 @@ class SnakeKanModel(nn.Module):
 
     def forward(self, x):
         return self.backbone(x)
+
+

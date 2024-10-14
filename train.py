@@ -5,6 +5,15 @@ import torch
 from tqdm import tqdm
 import numpy as np
 from utils import calculate_miou
+import matplotlib.pyplot as plt
+import json
+
+
+train_loss = []
+train_miou = []
+test_loss = []
+test_miou = []
+
 def getArgs():
     parser = argparse.ArgumentParser(description="命令行参数示例")
     parser.add_argument('--name', type=str, default='snakekan', help='Name of model')
@@ -19,14 +28,23 @@ def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
     prefix = 'Train' if train else 'Test'
     for images,labels in dataloader:
         images,labels = images.to(opt.device),labels.to(opt.device)
+        #plt.imshow(labels[0].cpu().numpy())
+        #plt.show()
         pred_masks = model(images)
         loss = opt.criterion(pred_masks, labels)
         optimizer.zero_grad()
         loss.backward()
-        optimizer.step()
+        if train:
+            optimizer.step()
         losses.append(loss.item())
         mious.append(calculate_miou(pred_masks, labels,opt.n_classes))
         dataloader.set_description(f"Phase: {prefix} | Epoch: {epoch} | Loss: {np.mean(losses)} | MIou: {np.mean(mious)}")
+    if train:
+        train_loss.append([epoch,np.mean(losses)])
+        train_miou.append([epoch,float(np.mean(mious))])
+    else:
+        test_loss.append([epoch,np.mean(losses)])
+        test_miou.append([epoch,float(np.mean(mious))])
     return np.mean(mious)
 
 if __name__ == '__main__':
@@ -43,10 +61,15 @@ if __name__ == '__main__':
     trainDataset = opt.dataset(opt,phase='train')
     valDataset = opt.dataset(opt,phase='val')
     trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=opt.batch_size, shuffle=True)
-    valLoader = torch.utils.data.DataLoader(valDataset,batch_size=opt.batch_size,shuffle=False)
+    valLoader = torch.utils.data.DataLoader(valDataset,batch_size=1,shuffle=False)
     for epoch in range(opt.epochs):
         pred_one_epoch(opt,model, trainLoader, optimizer, epoch,train=True)
         torch.save(model.state_dict(), 'latest.pth')
-        if (epoch+1)%5==0:
+        if (epoch+1)%2==0:
+            model.eval()
             miou = pred_one_epoch(opt,model, valLoader, optimizer, epoch,train=False)
             torch.save(model.state_dict(),f'./weights/{opt.name}_{epoch}_{miou}.pth')
+        json.dump(train_loss,open('logs/train_loss.json','w'))
+        json.dump(train_miou,open('logs/train_miou.json','w'))
+        json.dump(test_loss,open('logs/test_loss.json','w'))
+        json.dump(test_miou,open('logs/test_miou.json','w'))

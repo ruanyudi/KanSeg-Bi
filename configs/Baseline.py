@@ -8,7 +8,7 @@ from Dataset.CrackForestDataset import CrackForestDataset
 @dataclass
 class Config:
     name:str = 'baseline'
-    dataroot:str = '/Users/ruanyudi/PycharmProjects/KanSeg-Bi/data/crackforest'
+    dataroot:str = '/home/cavin/workspace/KanSeg-Bi/data/crackforest'
     seed:int = 42
     transforms=transforms.Compose([
         transforms.ToTensor(),

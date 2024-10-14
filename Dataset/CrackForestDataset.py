@@ -24,6 +24,9 @@ class CrackForestDataset(Dataset):
         elif phase=='val':
             self.images = self.images[split_num[0]:split_num[1]]
             self.labels = self.labels[split_num[0]:split_num[1]]
+        elif phase=='valtest':
+            self.images = self.images[split_num[0]:]
+            self.labels = self.labels[split_num[0]:]
         else:
             self.images = self.images[split_num[1]:]
             self.labels = self.labels[split_num[1]:]
@@ -39,6 +42,7 @@ class CrackForestDataset(Dataset):
         label = Image.open(label_filepath)
         image = self.opt.transforms(image)
         label = self.opt.transforms(label)
+        label[label>=0.1]=1.
         label = label.squeeze()
         return image, label.long()
     def __len__(self):
