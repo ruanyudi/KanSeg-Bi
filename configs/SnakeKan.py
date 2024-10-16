@@ -22,4 +22,4 @@ class Config:
     batch_size:int = 4
     epochs:int = 150
     device:str = 'cuda' if torch.cuda.is_available() else 'cpu'
-    eval_weight = './weights/SnakeKan_23_0.8609123229980469.pth'
+    eval_weight = './weights/SnakeKan_147_0.8917535543441772.pth'

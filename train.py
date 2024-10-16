@@ -34,7 +34,7 @@ def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
         loss = opt.criterion(pred_masks, labels)
         optimizer.zero_grad()
         loss.backward()
-        if train:
+        if train or True:
             optimizer.step()
         losses.append(loss.item())
         mious.append(calculate_miou(pred_masks, labels,opt.n_classes))
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     model=model.to(opt.device)
     optimizer = opt.optimizer(model.parameters(),lr=1e-4)
     trainDataset = opt.dataset(opt,phase='train')
-    valDataset = opt.dataset(opt,phase='val')
+    valDataset = opt.dataset(opt,phase='valtest')
     trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=opt.batch_size, shuffle=True)
     valLoader = torch.utils.data.DataLoader(valDataset,batch_size=1,shuffle=False)
     for epoch in range(opt.epochs):

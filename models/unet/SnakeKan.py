@@ -22,16 +22,16 @@ class SnakeKan(nn.Module):
         self.up3 = (Up(256, 128 // factor, bilinear))
         self.up4 = (Up(128, 64, bilinear))
         self.enc = nn.Sequential(
-            nn.Conv2d(128, 64, 1, 1),
+            nn.Conv2d(128, 32, 1, 1),
             nn.ReLU(),
-            DSConv(64, 64, 3,morph=0,device=opt.device),
+            DSConv(32, 32, 3,morph=0,device=opt.device),
             nn.ReLU(),
-            DSConv(64, 64, 3,morph=1,device=opt.device),
+            DSConv(32, 32, 3,morph=1,device=opt.device),
             nn.ReLU(),
-            nn.Conv2d(64, 64, 3, 1, 1),
+            nn.Conv2d(32, 32, 3, 1, 1),
         )
         ### b 64 h w
-        self.outc = KAN(layers_hidden=[64,32,16,n_classes])
+        self.outc = KAN(layers_hidden=[32,32,16,n_classes])
         self.channelwiseattention = ChannelWiseSelfAttention(128)
         self.adapter_1 = nn.Conv2d(512,16,1)
         self.adapter_2 = nn.Conv2d(256,16,1)
