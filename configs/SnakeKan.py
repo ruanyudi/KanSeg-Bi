@@ -8,7 +8,7 @@ from Dataset.CrackForestDataset import CrackForestDataset
 @dataclass
 class Config:
     name:str = 'SnakeKan'
-    dataroot:str = '/home/cavin/workspace/KanSeg-Bi/data/crackforest'
+    dataroot:str = '/Users/ruanyudi/PycharmProjects/KanSeg-Bi/data/crackforest'
     seed:int = 42
     transforms=transforms.Compose([
         transforms.ToTensor(),
@@ -22,4 +22,4 @@ class Config:
     batch_size:int = 4
     epochs:int = 150
     device:str = 'cuda' if torch.cuda.is_available() else 'cpu'
-    eval_weight = './weights/SnakeKan_147_0.8917535543441772.pth'
+    eval_weight = './weights/SnakeKan_9_0.7625501751899719.pth'

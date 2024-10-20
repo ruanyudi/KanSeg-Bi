@@ -21,7 +21,6 @@ def getArgs():
     return args
 
 def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
-    model.train()
     losses = []
     mious = []
     dataloader = tqdm(dataloader)
@@ -63,6 +62,7 @@ if __name__ == '__main__':
     trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=opt.batch_size, shuffle=True)
     valLoader = torch.utils.data.DataLoader(valDataset,batch_size=1,shuffle=False)
     for epoch in range(opt.epochs):
+        model.train()
         pred_one_epoch(opt,model, trainLoader, optimizer, epoch,train=True)
         torch.save(model.state_dict(), 'latest.pth')
         if (epoch+1)%2==0:

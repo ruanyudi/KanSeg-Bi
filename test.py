@@ -15,7 +15,6 @@ def getArgs():
     return args
 
 def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
-    model.train()
     losses = []
     mious = []
     f1_scores = []
@@ -24,6 +23,8 @@ def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
     dataloader = tqdm(dataloader)
     prefix = 'Train' if train else 'Test'
     for i,(images,labels) in enumerate(dataloader):
+        if i not in [35,486,487,376,495]:
+            continue
         images,labels = images.to(opt.device),labels.to(opt.device)
         pred_masks = model(images)
         loss = opt.criterion(pred_masks, labels)
@@ -78,3 +79,8 @@ if __name__ == '__main__':
     testLoader = torch.utils.data.DataLoader(testDataset,batch_size=opt.batch_size,shuffle=False)
     miou = pred_one_epoch(opt,model,testLoader,optimizer,0,train=False)
     print(miou)
+    print(testDataset.images[35])
+    print(testDataset.images[376])
+    print(testDataset.images[486])
+    print(testDataset.images[487])
+    print(testDataset.images[495])
