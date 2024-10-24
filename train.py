@@ -33,7 +33,7 @@ def pred_one_epoch(opt, model, dataloader, optimizer, epoch, train=True):
         loss = opt.criterion(pred_masks, labels)
         optimizer.zero_grad()
         loss.backward()
-        if train or True:
+        if train:
             optimizer.step()
         losses.append(loss.item())
         mious.append(calculate_miou(pred_masks, labels,opt.n_classes))
