@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 
+
 def calculate_iou(pred, label, num_classes):
     """
     计算每个类别的 IoU（Intersection over Union）对于一批图像。
@@ -15,8 +16,8 @@ def calculate_iou(pred, label, num_classes):
     """
     # 将 logits 转换为类别预测
     pred = torch.argmax(pred, axis=1)  # shape: (B, H, W)
-    pred=pred.cpu()
-    label=label.cpu()
+    pred = pred.cpu()
+    label = label.cpu()
 
     ious = []
 
@@ -25,14 +26,14 @@ def calculate_iou(pred, label, num_classes):
         union = 0
 
         for b in range(pred.shape[0]):  # 遍历每张图像
-            pred_cls = (pred[b] == cls)
-            label_cls = (label[b] == cls)
+            pred_cls = pred[b] == cls
+            label_cls = label[b] == cls
 
             intersection += np.logical_and(pred_cls, label_cls).sum()
             union += np.logical_or(pred_cls, label_cls).sum()
 
         if union == 0:
-            iou = float('nan')  # 如果并集为 0，意味着该类别在标签和预测中都不存在
+            iou = float("nan")  # 如果并集为 0，意味着该类别在标签和预测中都不存在
         else:
             iou = intersection / union
 

@@ -1,41 +1,43 @@
-""" Full assembly of the parts to form the complete network """
+"""Full assembly of the parts to form the complete network"""
 
 from .SnakeKan_parts import *
 from .ChannelWiseAttention import ChannelWiseSelfAttention
 from dataclasses import dataclass
 
+
 class SnakeKan(nn.Module):
-    def __init__(self,opt, n_channels, n_classes, bilinear=False):
+    def __init__(self, opt, n_channels, n_classes, bilinear=False):
         super(SnakeKan, self).__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
 
-        self.inc = (DoubleConv(n_channels, 64))
-        self.down1 = (Down(64, 128))
-        self.down2 = (Down(128, 256))
-        self.down3 = (Down(256, 512))
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
         factor = 2 if bilinear else 1
-        self.down4 = (Down(512, 1024 // factor))
-        self.up1 = (Up(1024, 512 // factor, bilinear))
-        self.up2 = (Up(512, 256 // factor, bilinear))
-        self.up3 = (Up(256, 128 // factor, bilinear))
-        self.up4 = (Up(128, 64, bilinear))
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
         self.enc = nn.Sequential(
             nn.Conv2d(128, 32, 1, 1),
             nn.ReLU(),
-            DSConv(32, 32, 3,morph=0,device=opt.device),
+            DSConv(32, 32, 3, morph=0, device=opt.device),
             nn.ReLU(),
-            DSConv(32, 32, 3,morph=1,device=opt.device),
+            DSConv(32, 32, 3, morph=1, device=opt.device),
             nn.ReLU(),
             nn.Conv2d(32, 32, 3, 1, 1),
         )
         ### b 64 h w
-        self.outc = KAN(layers_hidden=[32,32,16,n_classes])
+        self.outc = KAN(layers_hidden=[32, 32, 16, n_classes])
         self.channelwiseattention = ChannelWiseSelfAttention(128)
-        self.adapter_1 = nn.Conv2d(512,16,1)
-        self.adapter_2 = nn.Conv2d(256,16,1)
-        self.adapter_3 = nn.Conv2d(128,32,1)
+        self.adapter_1 = nn.Conv2d(512, 16, 1)
+        self.adapter_2 = nn.Conv2d(256, 16, 1)
+        self.adapter_3 = nn.Conv2d(128, 32, 1)
+
     def forward(self, x):
         b, _, h, w = x.shape
         x1 = self.inc(x)
@@ -45,20 +47,20 @@ class SnakeKan(nn.Module):
         x5 = self.down4(x4)
         scale_features = []
         x = self.up1(x5, x4)
-        scale_features.append(F.interpolate(self.adapter_1(x), (h,w)))
+        scale_features.append(F.interpolate(self.adapter_1(x), (h, w)))
         x = self.up2(x, x3)
-        scale_features.append(F.interpolate(self.adapter_2(x), (h,w)))
+        scale_features.append(F.interpolate(self.adapter_2(x), (h, w)))
         x = self.up3(x, x2)
-        scale_features.append(F.interpolate(self.adapter_3(x), (h,w)))
+        scale_features.append(F.interpolate(self.adapter_3(x), (h, w)))
         x = self.up4(x, x1)
         scale_features.append(x)
-        x = torch.cat(scale_features,1)
+        x = torch.cat(scale_features, 1)
         x = self.channelwiseattention(x)
         x = self.enc(x)
         x = x.flatten(2)
-        x = x.permute(0,2,1)
+        x = x.permute(0, 2, 1)
         logits = self.outc(x)
-        logits = logits.permute(0,2,1).reshape(b,-1,h,w)
+        logits = logits.permute(0, 2, 1).reshape(b, -1, h, w)
         return logits
 
     def use_checkpointing(self):
@@ -75,12 +77,13 @@ class SnakeKan(nn.Module):
 
 
 @dataclass
-class Option():
-    device = 'cpu'
+class Option:
+    device = "cpu"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     opt = Option()
     dummy_input = torch.randn(1, 3, 256, 256)
-    model = SnakeKan(opt,3,2)
-    pred=model(dummy_input)
+    model = SnakeKan(opt, 3, 2)
+    pred = model(dummy_input)
     print(pred.shape)
